@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UNREAL STREAMINGS</title>
-  <!-- Fonte moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
       font-family: 'Montserrat', sans-serif;
@@ -13,33 +13,36 @@
       padding: 0;
       background: #f5f7fa;
       color: #333;
+      transition: background 0.3s, color 0.3s;
     }
-    header {
+    body.dark-mode { background: #121212; color: #f5f5f5; }
+
+    /* Carrossel simplificado */
+    .carousel {
       position: relative;
-      text-align: center;
-      color: white;
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
     }
-    header img {
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: all 1s ease;
+    }
+    .slide img {
       width: 100%;
       height: 300px;
       object-fit: cover;
-      filter: brightness(0.6);
     }
-    header .overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .slide.active {
+      left: 0;
+      opacity: 1;
     }
-    header h1 {
-      font-size: 2.5rem;
-      margin: 0;
-      font-weight: 700;
-    }
-    header p {
-      font-size: 1.2rem;
-      margin-top: 10px;
-    }
+
     .container {
       width: 90%;
       max-width: 1200px;
@@ -57,29 +60,17 @@
       padding: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.6s ease;
+      position: relative;
+      opacity: 0;
+      transform: translateY(30px);
     }
-    .product:hover {
-      transform: translateY(-5px);
-    }
-    .product img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    .product h2 {
-      margin: 15px 0;
-      font-size: 1.5rem;
-    }
-    .product p {
-      font-size: 1rem;
-      margin: 10px 0;
-    }
-    .price {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #4CAF50;
-      margin: 15px 0;
-    }
+    body.dark-mode .product { background: #1e1e1e; color: #f5f5f5; }
+    .product.visible { opacity: 1; transform: translateY(0); }
+    .product:hover { transform: scale(1.03); }
+    .product img { max-width: 100%; border-radius: 8px; }
+    .product h2 { margin: 15px 0; font-size: 1.5rem; }
+    .price { font-size: 1.3rem; font-weight: 700; color: #4CAF50; margin: 15px 0; }
     .btn {
       display: inline-block;
       background: linear-gradient(45deg, #4CAF50, #2e7d32);
@@ -90,25 +81,210 @@
       border-radius: 8px;
       transition: 0.3s;
     }
-    .btn:hover {
-      background: linear-gradient(45deg, #43a047, #1b5e20);
+    .btn:hover { background: linear-gradient(45deg, #43a047, #1b5e20); }
+
+    /* Selos */
+    .badge { position: absolute; top: 15px; left: 15px; color: white; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; }
+    .badge.popular { background: #ff9800; }
+    .badge.promo { background: #e91e63; }
+
+    /* Garantia */
+    .garantia { display: flex; justify-content: space-around; margin: 50px 0; text-align: center; }
+    .garantia div { max-width: 200px; }
+    .garantia i { font-size: 2rem; color: #4CAF50; margin-bottom: 10px; }
+
+    /* FAQ */
+    .faq { margin: 50px 0; }
+    .faq h2 { text-align: center; margin-bottom: 20px; }
+    .faq-item { margin-bottom: 15px; }
+    .faq-item h3 { font-size: 1.1rem; cursor: pointer; }
+    .faq-item p { display: none; margin: 5px 0 0 0; }
+
+    footer { background: #333; color: white; text-align: center; padding: 15px; margin-top: 40px; }
+
+    /* Botão fixo WhatsApp */
+    .whatsapp-float {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: 20px; background: #25D366; color: white;
+      padding: 14px 22px; border-radius: 50px;
+      text-decoration: none; font-weight: bold; font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: background 0.3s ease; z-index: 1000;
     }
-    footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 40px;
+    .whatsapp-float:hover { background: #1EBE57; }
+
+    /* Botão Dark Mode */
+    #darkModeToggle {
+      position: fixed; top: 20px; right: 20px;
+      background: #007BFF; color: white; border: none;
+      padding: 10px 15px; border-radius: 8px; cursor: pointer;
+      z-index: 1100;
     }
+
+    /* Voltar ao Topo */
+    #backToTop {
+      position: fixed; bottom: 80px; right: 20px; display: none;
+      background: #007BFF; color: white; padding: 12px 16px;
+      border-radius: 50%; font-size: 18px; border: none; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000;
+    }
+
+    /* Animação de clique */
+    @keyframes bounce-click {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(0.9); }
+      50%  { transform: scale(1.05); }
+      70%  { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .btn.bounce { animation: bounce-click 0.4s ease; }
   </style>
 </head>
 <body>
-  <!-- TOPO COM IMAGEM -->
-  <header>
-    <img src="DIVERSÃO SEM LIMITES_20250914_165855_0000.jpg" alt="Banner de destaque">
-    <div class="overlay">
-      <h1>UNREAL STREAMINGS</h1>
-      <p>Diversão pra toda família pelo menor preço!</p>
+  <!-- Carrossel simplificado -->
+  <div class="carousel">
+    <!-- Slide 1 -->
+    <div class="slide active">
+      <img src="banner1.jpg" alt="Banner 1">
+    </div>
+    <!-- Slide 2 -->
+    <div class="slide">
+      <img src="banner2.jpg" alt="Banner 2">
+    </div>
+    <!-- Slide 3 -->
+    <div class="slide">
+      <img src="banner3.jpg" alt="Banner 3">
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="products">
+      <!-- Produto 1 -->
+      <div class="product">
+        <span class="badge popular">Mais Vendido</span>
+        <img src="46aa4f435321758d3ce2e84c78f2529c.jpg" alt="Produto 1">
+        <h2>HBO MAX PLATINUM</h2>
+        <p>DEPOIS DA COMPRA CLIQUE EM "CHAMAR NO WHATSAPP" ENVIE O COMPROVANTE E NOME DO SEU PRODUTO!</p>
+        <div class="price">R$ 9,99</div>
+        <a href="https://nubank.com.br/cobrar/7o944/68c6fc49-a528-483e-b96d-ec4074d7313c" class="btn">Comprar Agora</a>
+      </div>
+
+      <!-- Produto 2 -->
+      <div class="product">
+        <span class="badge promo">Promoção</span>
+        <img src="785e92396025ff4cf8c77ac04c8f7b10.jpg" alt="Produto 2">
+        <h2>DISNEY PREMIUM</h2>
+        <p>Oferta por tempo limitado!</p>
+        <div id="countdown"></div>
+        <div class="price">R$ 10,00</div>
+        <a href="https://nubank.com.br/cobrar/7o944/68c6fcdb-0664-4766-9fcc-53a5bf3eadd4" class="btn">Comprar Agora</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Garantia -->
+  <div class="container garantia">
+    <div><i class="fas fa-lock"></i><p>Compra Segura</p></div>
+    <div><i class="fas fa-bolt"></i><p>Entrega Imediata</p></div>
+    <div><i class="fas fa-headset"></i><p>Suporte 24h</p></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="container faq">
+    <h2>Perguntas Frequentes</h2>
+    <div class="faq-item"><h3>Como recebo meu acesso?</h3><p>Você recebe no WhatsApp em poucos minutos após a compra.</p></div>
+    <div class="faq-item"><h3>É vitalício?</h3><p>Depende do plano contratado, com garantia de renovação.</p></div>
+    <div class="faq-item"><h3>Funciona em vários dispositivos?</h3><p>Sim, pode usar em múltiplos aparelhos.</p></div>
+  </div>
+
+  <footer>
+    <p>© 2025 Sua Loja - Todos os direitos reservados</p>
+  </footer>
+
+  <!-- Botões Fixos -->
+  <a href="https://wa.me/qr/LBJSB3BSMLY5H1" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i> CHAMAR NO WHATSAPP
+  </a>
+  <button id="backToTop"><i class="fas fa-arrow-up"></i></button>
+  <button id="darkModeToggle"><i class="fas fa-moon"></i></button>
+
+  <script>
+    // Animação clique
+    document.querySelectorAll('.btn').forEach(button => {
+      button.addEventListener('click', function() {
+        this.classList.add('bounce');
+        setTimeout(() => this.classList.remove('bounce'), 400);
+      });
+    });
+
+    // FAQ toggle
+    document.querySelectorAll('.faq-item h3').forEach(item => {
+      item.addEventListener('click', () => {
+        const p = item.nextElementSibling;
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+
+    // Voltar ao topo
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backToTop.style.display = window.scrollY > 300 ? 'block' : 'none';
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Animação de entrada
+    const products = document.querySelectorAll('.product');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.2 });
+    products.forEach(product => observer.observe(product));
+
+    // Carrossel simplificado
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 4000);
+
+    // Contador regressivo
+    function startCountdown(endDate) {
+      const countdown = document.getElementById("countdown");
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = endDate - now;
+        if (distance < 0) {
+          countdown.innerHTML = "Oferta Expirada!";
+          return;
+        }
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000*60*60));
+        const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((distance % (1000*60)) / 1000);
+        countdown.innerHTML = `Expira em: ${hours}h ${minutes}m ${seconds}s`;
+      }
+      setInterval(updateCountdown, 1000);
+    }
+    const endDate = new Date().getTime() + (6 * 60 * 60 * 1000); // 6 horas
+    startCountdown(endDate);
+
+    // Dark Mode
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') 
+        ? '<i class="fas fa-sun"></i>' 
+        : '<i class="fas fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>      <p>Diversão pra toda família pelo menor preço!</p>
     </div>
   </header>
 
